@@ -94,12 +94,10 @@ chmod -R 755 /www/wwwroot/yoursite.com
 ```
 services:
   cdt-monitor:
-    image: qninq/cdt-monitor:latest
-    # build: .
+    image: skytianyu/cdt-monitor:latest
     container_name: cdt-monitor
     restart: always
-    ports:
-      - "43210:80"  # 将容器的 80 端口映射到宿主机的 43210 端口
+    network_mode: host
     volumes:
       # 持久化数据目录，确保重启后配置和数据库不丢失
       - ./data:/var/www/html/data
@@ -107,6 +105,7 @@ services:
       # - ./logs:/var/log/nginx
     environment:
       - TZ=Asia/Shanghai  # 设置时区，对 Cron 任务很重要
+      - WEB_PORT=43210
 ```
 
 启动服务：
@@ -121,10 +120,11 @@ docker-compose up -d
 docker run -d \
     --name cdt-monitor \
     --restart always \
-    -p 43210:80 \
+    --network host \
     -v $(pwd)/data:/var/www/html/data \
     -e TZ=Asia/Shanghai \
-    qninq/cdt-monitor:latest
+    -e WEB_PORT=43210 \
+    skytianyu/cdt-monitor:latest
 ```
 
 部署完成后，访问 `http://服务器IP:43210` 即可开始使用。
